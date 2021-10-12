@@ -17,10 +17,11 @@ def scenario(column,requestedFloor, direction, destination):
         pickedUpUser = True 
     
     selectedElevator.requestFloor(destination)
+    moveAllElevators(tempColumn)
 
-    for i in range(len(tempColumn.elevatorsList)):
-        if tempColumn.elevatorsList[i].ID == selectedElevator.ID:
-            tempColumn.elevatorsList[i].currentFloor = selectedElevator.currentFloor
+    for i in range(len(tempColumn.elevatorList)):
+        if tempColumn.elevatorList[i].ID == selectedElevator.ID:
+            tempColumn.elevatorList[i].currentFloor = selectedElevator.currentFloor
         i+=1
 
     results = {
@@ -31,15 +32,22 @@ def scenario(column,requestedFloor, direction, destination):
     return results
 
 column1 = Column(1, 10, 2)
+
+#Makes the elevators who already have requests move before continuing with the scenario
+def moveAllElevators(column):
+    for elevator in column.elevatorList:
+        while len(elevator.floorRequestList) != 0:
+            elevator.move()
+
 def test_Instantiates_a_Column_with_valid_attributes():
     
     assert type(column1) is Column
     assert column1.ID == 1
     assert column1.status is not None
-    assert len(column1.elevatorsList) is 2
-    assert type(column1.elevatorsList[0]) is Elevator
-    assert len(column1.callButtonsList) is 18
-    assert type(column1.callButtonsList[0]) is CallButton
+    assert len(column1.elevatorList) is 2
+    assert type(column1.elevatorList[0]) is Elevator
+    assert len(column1.callButtonList ) is 18
+    assert type(column1.callButtonList [0]) is CallButton
 
 def test_Has_a_requestElevator_method():
     assert column1.requestElevator(1, "up") != None
@@ -56,7 +64,7 @@ def test_Instantiates_a_Elevator_with_valid_attributes():
     assert elevator.status is not None
     assert elevator.currentFloor is not None
     assert type(elevator.door) is Door
-    assert len(elevator.floorRequestButtonsList) is 10
+    assert len(elevator.floorRequestButtonList) is 10
 
 def test_Has_a_requestFloor_method():
     assert elevator.requestFloor(1) is not AttributeError
@@ -83,10 +91,10 @@ def test_Instantiates_a_Door_with_valid_attributes():
     assert door.status is not None
 
 #------------------------------------Scenario 1--------------------------------------------------------
-column1.elevatorsList[0].currentFloor = 2
-column1.elevatorsList[0].status = 'idle'
-column1.elevatorsList[1].currentFloor = 6
-column1.elevatorsList[1].status = 'idle'
+column1.elevatorList[0].currentFloor = 2
+column1.elevatorList[0].status = 'idle'
+column1.elevatorList[1].currentFloor = 6
+column1.elevatorList[1].status = 'idle'
 
 results = scenario(column1, 3, 'up', 7)
 
@@ -100,14 +108,14 @@ def test_Part_1_of_scenario_1_brings_the_user_to_destination():
     assert results["selectedElevator"].currentFloor is 7
 
 def test_Part_1_of_scenario_1_ends_with_all_the_elevators_at_the_right_position():
-    assert results["tempColumn"].elevatorsList[0].currentFloor is 7
-    assert results["tempColumn"].elevatorsList[1].currentFloor is 6
+    assert results["tempColumn"].elevatorList[0].currentFloor is 7
+    assert results["tempColumn"].elevatorList[1].currentFloor is 6
 
 #------------------------------------Scenario 2--------------------------------------------------------
-column1.elevatorsList[0].currentFloor = 10
-column1.elevatorsList[0].status = 'idle'
-column1.elevatorsList[1].currentFloor = 3
-column1.elevatorsList[1].status = 'idle'
+column1.elevatorList[0].currentFloor = 10
+column1.elevatorList[0].status = 'idle'
+column1.elevatorList[1].currentFloor = 3
+column1.elevatorList[1].status = 'idle'
 
 results1 = scenario(column1, 1, 'up', 6)
         
@@ -129,8 +137,8 @@ def test_Part_1_of_scenario_2_brings_the_user_to_destination():
     assert results1["selectedElevator"].currentFloor is 6
 
 def test_Part_1_of_scenario_2_ends_with_all_the_elevators_at_the_right_position():
-    assert results1["tempColumn"].elevatorsList[0].currentFloor is 10
-    assert results1["tempColumn"].elevatorsList[1].currentFloor is 6
+    assert results1["tempColumn"].elevatorList[0].currentFloor is 10
+    assert results1["tempColumn"].elevatorList[1].currentFloor is 6
 
 def test_Part_2_of_scenario_2_chooses_the_best_elevator():
     assert results2["selectedElevator"].ID is 2
@@ -142,8 +150,8 @@ def test_Part_2_of_scenario_2_brings_the_user_to_destination():
     assert results2["selectedElevator"].currentFloor is 5
 
 def test_Part_2_of_scenario_2_ends_with_all_the_elevators_at_the_right_position():
-    assert results2["tempColumn"].elevatorsList[0].currentFloor is 10
-    assert results2["tempColumn"].elevatorsList[1].currentFloor is 5
+    assert results2["tempColumn"].elevatorList[0].currentFloor is 10
+    assert results2["tempColumn"].elevatorList[1].currentFloor is 5
 
 def test_Part_3_of_scenario_2_chooses_the_best_elevator():
     assert results3["selectedElevator"].ID is 1
@@ -155,19 +163,19 @@ def test_Part_3_of_scenario_2_brings_the_user_to_destination():
     assert results3["selectedElevator"].currentFloor is 2
 
 def test_Part_3_of_scenario_2_ends_with_all_the_elevators_at_the_right_position():
-    assert results3["tempColumn"].elevatorsList[0].currentFloor is 2
-    assert results3["tempColumn"].elevatorsList[1].currentFloor is 5
+    assert results3["tempColumn"].elevatorList[0].currentFloor is 2
+    assert results3["tempColumn"].elevatorList[1].currentFloor is 5
 
 #------------------------------------Scenario 3--------------------------------------------------------
-column1.elevatorsList[0].currentFloor = 10
-column1.elevatorsList[0].status = 'idle'
-column1.elevatorsList[1].currentFloor = 3
-column1.elevatorsList[1].direction = 'up'
-column1.elevatorsList[1].status = 'moving'
+column1.elevatorList[0].currentFloor = 10
+column1.elevatorList[0].status = 'idle'
+column1.elevatorList[1].currentFloor = 3
+column1.elevatorList[1].direction = 'up'
+column1.elevatorList[1].status = 'moving'
 
 results4 = scenario(column1, 3, 'down', 2)
-results4["tempColumn"].elevatorsList[1].currentFloor = 6
-results4["tempColumn"].elevatorsList[1].status = 'idle'
+results4["tempColumn"].elevatorList[1].currentFloor = 6
+results4["tempColumn"].elevatorList[1].status = 'idle'
 
 column1 = copy.deepcopy(results4["tempColumn"]) # update the column state with last scenario's result
 
@@ -184,8 +192,8 @@ def test_Part_1_of_scenario_3_brings_the_user_to_destination():
     assert results4["selectedElevator"].currentFloor is 2
 
 def test_Part_1_of_scenario_3_ends_with_all_the_elevators_at_the_right_position():
-    assert results4["tempColumn"].elevatorsList[0].currentFloor is 2
-    assert results4["tempColumn"].elevatorsList[1].currentFloor is 6
+    assert results4["tempColumn"].elevatorList[0].currentFloor is 2
+    assert results4["tempColumn"].elevatorList[1].currentFloor is 6
 
 
 def test_Part_2_of_scenario_3_chooses_the_best_elevator():
@@ -198,5 +206,5 @@ def test_Part_2_of_scenario_3_brings_the_user_to_destination():
     assert results5["selectedElevator"].currentFloor is 3
 
 def test_Part_2_of_scenario_3_ends_with_all_the_elevators_at_the_right_position():
-    assert results5["tempColumn"].elevatorsList[0].currentFloor is 2
-    assert results5["tempColumn"].elevatorsList[1].currentFloor is 3
+    assert results5["tempColumn"].elevatorList[0].currentFloor is 2
+    assert results5["tempColumn"].elevatorList[1].currentFloor is 3
